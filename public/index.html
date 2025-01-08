@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <main
+      style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        border: 1px solid black;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+      "
+    >
+      <h1>
+        <span>Generate short url</span>
+        <form>
+          <input
+            id="input"
+            type="text"
+            style="width: 90%; margin: auto; padding: 5px"
+            placeholder="Original url"
+          />
+          <button type="button" onclick="generate()">Generate</button>
+          <button type="button" onclick="getInfo()">Info</button>
+        </form>
+        <div id="result" style="font-size: 14px"></div>
+      </h1>
+    </main>
+  </body>
+  <script>
+    async function generate() {
+      const originalUrl = document.getElementById('input').value
+
+      try {
+        const response = await fetch('/api/shorten', {
+          method: 'POST',
+          body: JSON.stringify({ originalUrl }),
+          headers: { 'Content-Type': 'application/json' },
+        })
+        const result = await response.json()
+
+        if (response.status !== 200) throw new Error()
+
+        document.getElementById(
+          'result'
+        ).innerHTML = `<a href=${result} target="_blank"">${result}</a>`
+      } catch (error) {
+        alert(error.message)
+      }
+    }
+
+    async function getInfo() {
+      const originalUrl = document.getElementById('input').value
+
+      try {
+        const response = await fetch('/api/info/' + originalUrl, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        })
+
+        if (response.status !== 200) throw new Error()
+
+        const result = await response.json()
+
+        document.getElementById('result').innerText = JSON.stringify(result)
+      } catch (error) {
+        alert(error.message)
+      }
+    }
+  </script>
+</html>
